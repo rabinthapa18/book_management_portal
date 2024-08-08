@@ -1,0 +1,32 @@
+.selected {
+  background-color: #858585;
+}
+
+tr {
+  transition: background-color 300ms;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+td {
+  padding: 0.5em;
+}
+
+td:nth-child(1) {
+  width: 5%;
+}
+
+td:nth-child(2) {
+  width: 5%;
+}
+
+td:nth-child(3) {
+  width: 35%;
+}
+
+td:nth-child(4) {
+  width: 35%;
+}
+
+td:nth-child(5) {
+  width: 20%;
+}

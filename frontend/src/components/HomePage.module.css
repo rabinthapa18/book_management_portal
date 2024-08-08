@@ -1,0 +1,38 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  border: 1px solid #6754d4;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  background-color: #9286d2;
+  font-weight: 700;
+  padding: 8px 16px;
+  color: #e8e4fe;
+}
+
+.table-container {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background-color: #888;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
