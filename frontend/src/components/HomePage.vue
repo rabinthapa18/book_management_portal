@@ -1,6 +1,7 @@
 <template>
   <h1>{{ heading }}</h1>
   <div class="table-actions">
+    <v-row justify="start"> </v-row>
     <v-row justify="start">
       <!-- delete button -->
       <v-col cols="12" md="2" class="mb-2">
@@ -25,7 +26,7 @@
         >
       </v-col>
       <!-- spacer -->
-      <v-col cols="12" md="5" class="mb-2"> </v-col>
+      <v-col cols="12" md="3" class="mb-2"> </v-col>
       <!-- sort dropdown -->
       <v-col cols="12" md="3" class="mb-3">
         <v-menu>
@@ -55,6 +56,50 @@
             </v-list-item>
           </v-list>
         </v-menu>
+      </v-col>
+      <v-col cols="12" md="2" class="mb-2">
+        <!-- dialog to add a book -->
+        <v-dialog max-width="500" persistent>
+          <template v-slot:activator="{ props: activatorProps }">
+            <v-btn
+              v-bind="activatorProps"
+              rounded="lg"
+              block
+              prepend-icon="mdi-plus"
+              >Add</v-btn
+            >
+          </template>
+          <template v-slot:default="{ isActive }">
+            <v-card title="Add a book">
+              <v-card-text>
+                <v-text-field
+                  label="Title"
+                  outlined
+                  clearable
+                  v-model="title"
+                ></v-text-field>
+                <v-text-field
+                  label="Author"
+                  outlined
+                  clearable
+                  v-model="author"
+                ></v-text-field>
+                <v-text-field
+                  label="Genre"
+                  placeholder="Enter genres separated by comma"
+                  outlined
+                  clearable
+                  v-model="genre"
+                ></v-text-field>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn text="Cancel" @click="isActive.value = false"></v-btn>
+              </v-card-actions>
+            </v-card>
+          </template>
+        </v-dialog>
       </v-col>
     </v-row>
   </div>
@@ -130,8 +175,6 @@ export default {
       selectedBooks: [],
       selectAll: false,
       isFetching: false,
-      sortItem: null,
-      sortDesc: false,
     };
   },
   async mounted() {
