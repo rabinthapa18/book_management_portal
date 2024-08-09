@@ -1,7 +1,59 @@
 <template>
   <h1>{{ heading }}</h1>
-  <div class="table-actions">
-    <v-row justify="start"> </v-row>
+  <div class="actions">
+    <v-row justify="start" no-gutters>
+      <v-col cols="12" md="2">
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn
+              v-bind="props"
+              rounded="0"
+              block
+              append-icon="mdi-menu-down"
+              style="height: 100%"
+            >
+              {{ searchAttribute }}
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item @click="setSearchAttribute('title')">
+              <v-list-item-title>Title</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="setSearchAttribute('author')">
+              <v-list-item-title>Author</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </v-col>
+      <!-- search bar -->
+      <v-col cols="12" md="7">
+        <v-text-field
+          :loading="loading"
+          append-inner-icon="mdi-magnify"
+          density="compact"
+          :label="`Search by ${searchAttribute}`"
+          variant="solo"
+          hide-details
+          single-line
+          rounded="0"
+          @click:append-inner="onClick"
+        ></v-text-field>
+      </v-col>
+      <!-- spacer -->
+      <v-col cols="12" md="1"> </v-col>
+      <!-- export button -->
+      <v-col cols="12" md="2">
+        <v-btn
+          rounded="0"
+          block
+          prepend-icon="mdi-file-export"
+          style="height: 100%"
+          >Export</v-btn
+        >
+      </v-col>
+    </v-row>
+
+    <!-- table actions -->
     <v-row justify="start">
       <!-- delete button -->
       <v-col cols="12" md="2" class="mb-2">
@@ -31,13 +83,7 @@
       <v-col cols="12" md="3" class="mb-3">
         <v-menu>
           <template v-slot:activator="{ props }">
-            <v-btn
-              v-bind="props"
-              rounded="lg"
-              block
-              prepend-icon="mdi-sort"
-              @click="sortDesc = !sortDesc"
-            >
+            <v-btn v-bind="props" rounded="lg" block prepend-icon="mdi-sort">
               Sort by
             </v-btn>
           </template>
@@ -175,6 +221,8 @@ export default {
       selectedBooks: [],
       selectAll: false,
       isFetching: false,
+      searchAttribute: "author",
+      searchTerm: "",
     };
   },
   async mounted() {
@@ -259,6 +307,11 @@ export default {
         }
         return 0;
       });
+    },
+
+    // set search attribute
+    setSearchAttribute(searchAttribute) {
+      this.searchAttribute = searchAttribute;
     },
   },
 };
