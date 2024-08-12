@@ -37,8 +37,15 @@ class BookRepository
         return $book->save();
     }
 
+    // Delete a book
     public function deleteBook(int $id): bool
     {
         return $this->model->destroy($id);
+    }
+
+    // Sort books
+    public function sortBooks(string $sortAttribute, string $order): object
+    {
+        return $this->model->orderByRaw("LOWER($sortAttribute) $order")->get();
     }
 }

@@ -106,6 +106,14 @@ class BookController extends Controller
      */
     public function sort(SortBookRequest $request)
     {
-        //
+        try {
+            $sortAttribute = $request->sortAttribute;
+            $order = $request->order;
+
+            $books = $this->bookRepository->sortBooks($sortAttribute, $order);
+            return response()->json(['message' => 'Books sorted', 'books' => $books], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
     }
 }
