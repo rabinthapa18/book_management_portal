@@ -76,7 +76,7 @@ class BookController extends Controller
             $book->author = $request->updatedAuthorName;
 
             $this->bookRepository->updateBook($book);
-            return response()->json(['message' => 'Author updated sucessfully', 'book' => $book], 200);
+            return response()->json(['message' => 'Author updated successfully', 'book' => $book], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
@@ -95,7 +95,7 @@ class BookController extends Controller
             }
 
             $this->bookRepository->deleteBook($request->id);
-            return response()->json(['message' => 'Book deleted sucessfully',], 200);
+            return response()->json(['message' => 'Book deleted successfully',], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
