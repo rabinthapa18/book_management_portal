@@ -28,7 +28,7 @@
       <!-- search bar -->
       <v-col cols="12" md="7">
         <v-text-field
-          :loading="loading"
+          v-model="searchTerm"
           append-inner-icon="mdi-magnify"
           density="compact"
           :label="`Search by ${searchAttribute}`"
@@ -37,6 +37,7 @@
           single-line
           rounded="0"
           @click:append-inner="onClick"
+          @keyup="searchBooks"
         ></v-text-field>
       </v-col>
       <!-- spacer -->
@@ -439,6 +440,42 @@ export default {
       } catch (error) {
         console.error(error);
       }
+    },
+
+    // search books based on search term
+    async searchBooks() {
+      this.isFetching = true;
+
+      if (this.searchTerm === "") {
+        this.fetchBooks();
+        return;
+      }
+
+      // fetch books from API
+      await fetch(`${import.meta.env.VUE_API_URL}/searchBooks`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          searchAttribute: this.searchAttribute,
+          searchTerm: this.searchTerm,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          let books = data.books;
+          // for each book, change the genre from string to array
+          books.forEach((book) => {
+            if (typeof book.genre === "string") {
+              book.genre = JSON.parse(book.genre);
+            }
+          });
+
+          this.books = books;
+        })
+        .catch((error) => console.error(error))
+        .finally(() => (this.isFetching = false));
     },
   },
 };
