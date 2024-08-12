@@ -266,7 +266,6 @@ export default {
         });
 
         this.books = books;
-        console.log(this.books);
       } catch (error) {
         console.error(error);
       }
@@ -274,20 +273,34 @@ export default {
     },
 
     // sort books from API
-    sortBooks(sortItem, sortingMethod) {
-      // Simulating API for call
-      // TODO: Replace with actual API call
-      this.books.sort((a, b) => {
-        let itemA = a[sortItem].toString().toLowerCase();
-        let itemB = b[sortItem].toString().toLowerCase();
+    async sortBooks(sortAttribute, order) {
+      this.isFetching = true;
+      console.log(sortAttribute, order);
 
-        if (sortingMethod === "asc") {
-          return itemA < itemB ? -1 : itemA > itemB ? 1 : 0;
-        } else if (sortingMethod === "desc") {
-          return itemA > itemB ? -1 : itemA < itemB ? 1 : 0;
-        }
-        return 0;
-      });
+      // change to formdata
+      let formData = new FormData();
+      formData.append("sortAttribute", sortAttribute);
+      formData.append("order", order);
+
+      // fetch books from API
+      await fetch(`${import.meta.env.VUE_API_URL}/sortBooks`, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          let books = data.books;
+          // for each book, change the genre from string to array
+          books.forEach((book) => {
+            if (typeof book.genre === "string") {
+              book.genre = JSON.parse(book.genre);
+            }
+          });
+
+          this.books = books;
+        })
+        .catch((error) => console.error(error))
+        .finally(() => (this.isFetching = false));
     },
 
     // set search attribute
