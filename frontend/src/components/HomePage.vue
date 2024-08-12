@@ -250,46 +250,27 @@ export default {
     },
 
     // fetch books from API
-    fetchBooks() {
+    async fetchBooks() {
       this.isFetching = true;
 
-      // Simulating API call
-      // TODO: Replace with actual API call
-      setTimeout(() => {
-        this.books = [
-          {
-            id: "1",
-            title: "To Kill a Mockingbird",
-            genre: ["Classic", "Historical", "Fiction"],
-            author: "Harper Lee",
-          },
-          {
-            id: "2",
-            title: "1984",
-            genre: ["Dystopian", "Science Fiction", "Political Fiction"],
-            author: "George Orwell",
-          },
-          {
-            id: "3",
-            title: "Pride and Prejudice",
-            genre: ["Romance"],
-            author: "Jane Austen",
-          },
-          {
-            id: "4",
-            title: "The Great Gatsby",
-            genre: ["Classic", "Fiction"],
-            author: "F. Scott Fitzgerald",
-          },
-          {
-            id: "5",
-            title: "Moby Dick",
-            genre: ["Adventure", "Classic", "Fiction"],
-            author: "Herman Melville",
-          },
-        ];
-        this.isFetching = false;
-      }, 2000);
+      // fetch books from API
+      try {
+        let response = await fetch(`${import.meta.env.VUE_API_URL}/books`);
+        let data = await response.json();
+        let books = data.books;
+        // for each book, change the genre from string to array
+        books.forEach((book) => {
+          if (typeof book.genre === "string") {
+            book.genre = JSON.parse(book.genre);
+          }
+        });
+
+        this.books = books;
+        console.log(this.books);
+      } catch (error) {
+        console.error(error);
+      }
+      this.isFetching = false;
     },
 
     // sort books from API
