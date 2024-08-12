@@ -113,36 +113,42 @@
               rounded="lg"
               block
               prepend-icon="mdi-plus"
-              >Add</v-btn
             >
+              Add
+            </v-btn>
           </template>
           <template v-slot:default="{ isActive }">
             <v-card title="Add a book">
               <v-card-text>
-                <v-text-field
-                  label="Title"
-                  outlined
-                  clearable
-                  v-model="title"
-                ></v-text-field>
-                <v-text-field
-                  label="Author"
-                  outlined
-                  clearable
-                  v-model="author"
-                ></v-text-field>
-                <v-text-field
-                  label="Genre"
-                  placeholder="Enter genres separated by comma"
-                  outlined
-                  clearable
-                  v-model="genre"
-                ></v-text-field>
+                <v-form ref="bookForm" v-model="formValid">
+                  <v-text-field
+                    label="Title"
+                    outlined
+                    clearable
+                    v-model="title"
+                    :rules="[(v) => !!v || 'Title is required']"
+                  ></v-text-field>
+                  <v-text-field
+                    label="Author"
+                    outlined
+                    clearable
+                    v-model="author"
+                    :rules="[(v) => !!v || 'Author is required']"
+                  ></v-text-field>
+                  <v-text-field
+                    label="Genre"
+                    placeholder="Enter genres separated by comma"
+                    outlined
+                    clearable
+                    v-model="genre"
+                    :rules="[(v) => !!v || 'Atleast 1 genre is required']"
+                  ></v-text-field>
+                </v-form>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-
-                <v-btn text="Cancel" @click="isActive.value = false"></v-btn>
+                <v-btn text @click="validateForm(isActive)">Save</v-btn>
+                <v-btn text @click="isActive.value = false">Cancel</v-btn>
               </v-card-actions>
             </v-card>
           </template>
@@ -224,6 +230,11 @@ export default {
       isFetching: false,
       searchAttribute: "author",
       searchTerm: "",
+      loading: false,
+      title: "",
+      author: "",
+      genre: "",
+      formValid: false,
     };
   },
   async mounted() {
@@ -231,6 +242,36 @@ export default {
   },
 
   methods: {
+    // form validation method
+    validateForm(isActive) {
+      this.$refs.bookForm.validate();
+      if (this.formValid) {
+        isActive.value = false;
+        this.saveBook();
+      }
+    },
+
+    // method to save the book
+    saveBook() {
+      let formData = new FormData();
+      formData.append("title", this.title);
+      formData.append("author", this.author);
+      formData.append("genre", JSON.stringify(this.genre.split(",")));
+
+      fetch(`${import.meta.env.VUE_API_URL}/addBook`, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          this.fetchBooks();
+          this.title = "";
+          this.author = "";
+          this.genre = "";
+        })
+        .catch((error) => console.error(error));
+    },
+
     // select/unselect all books
     toggleAllSelection() {
       if (this.selectAll) {
