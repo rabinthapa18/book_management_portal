@@ -24,7 +24,11 @@ class BookController extends Controller
      */
     public function index()
     {
-        return  $this->bookRepository->getAllBooks();
+        try {
+            return  response()->json(['message' => 'Data fetched successfully', 'books' => $this->bookRepository->getAllBooks()], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
     }
 
     /**
@@ -32,7 +36,6 @@ class BookController extends Controller
      */
     public function store(BookRequest $request)
     {
-        //        dd($request);
         try {
             $book = new Book();
             $book->fill($request->all());

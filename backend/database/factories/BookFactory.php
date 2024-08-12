@@ -16,13 +16,13 @@ class BookFactory extends Factory
      */
     public function definition(): array
     {
-        $type = $this->faker->randomElement(['fiction', 'non-fiction']);
+        $genres = $this->faker->randomElements(['fiction', 'non-fiction', 'biography'], rand(1, 3));
         $title = $this->faker->sentence(3);
         $author = $this->faker->name;
         return [
             'title' => $title,
             'author' => $author,
-            'genre' => $type,
+            'genre' => json_encode($genres),
         ];
     }
 }
