@@ -3,9 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Repository\BookRepository;
-use App\Http\Requests\BookRequest;
-use App\Http\Requests\SortBookRequest;
-use App\Http\Requests\UpdateBookRequest;
 use App\Models\Book;
 use Illuminate\Http\Request;
 
@@ -34,8 +31,13 @@ class BookController extends Controller
     /**
      * Store a newly created book in storage.
      */
-    public function store(BookRequest $request)
+    public function store(Request $request)
     {
+        $request->validate([
+            'title' => 'required|string',
+            'author' => 'required|string',
+            'genre' => 'required|string',
+        ]);
         try {
             $book = new Book();
             $book->fill($request->all());
@@ -65,9 +67,12 @@ class BookController extends Controller
     /**
      * Update the specified book in storage.
      */
-    public function update(UpdateBookRequest $request)
+    public function update(Request $request)
     {
-        //
+        $request->validate([
+            'updatedAuthorName' => 'required|string'
+        ]);
+
         try {
             // get the book from the database by id
             $book = $this->bookRepository->findBookById($request->id);
@@ -107,8 +112,13 @@ class BookController extends Controller
     /**
      * Sort the books.
      */
-    public function sort(SortBookRequest $request)
+    public function sort(Request $request)
     {
+        $request->validate([
+            'sortAttribute' => 'required|string',
+            'order' => 'required|string'
+        ]);
+
         try {
             $sortAttribute = $request->sortAttribute;
             $order = $request->order;
@@ -125,13 +135,12 @@ class BookController extends Controller
      */
     public function search(Request $request)
     {
+        $request->validate([
+            'searchTerm' => 'required|string',
+            'searchAttribute' => 'required|string'
+        ]);
+
         try {
-
-            $request->validate([
-                'searchTerm' => 'required|string',
-                'searchAttribute' => 'required|string'
-            ]);
-
             $searchTerm = $request->searchTerm;
             $searchAttribute = $request->searchAttribute;
 
