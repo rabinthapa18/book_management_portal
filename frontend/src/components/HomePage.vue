@@ -62,6 +62,7 @@
           block
           prepend-icon="mdi-delete"
           :disabled="selectedBooks.length === 0"
+          @click="deleteBooks"
         >
           Delete</v-btn
         >
@@ -298,6 +299,27 @@ export default {
           });
 
           this.books = books;
+        })
+        .catch((error) => console.error(error))
+        .finally(() => (this.isFetching = false));
+    },
+
+    // delete selected books
+    async deleteBooks() {
+      this.isFetching = true;
+
+      // useing promise.all to delete multiple books
+      await Promise.all(
+        this.selectedBooks.map(async (bookId) => {
+          await fetch(`${import.meta.env.VUE_API_URL}/deleteBook/${bookId}`, {
+            method: "DELETE",
+          });
+        })
+      )
+        .then(() => {
+          this.selectedBooks = [];
+          this.selectAll = false;
+          this.fetchBooks();
         })
         .catch((error) => console.error(error))
         .finally(() => (this.isFetching = false));
