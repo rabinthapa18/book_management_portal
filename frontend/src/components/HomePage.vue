@@ -74,6 +74,7 @@
           block
           prepend-icon="mdi-pencil"
           :disabled="selectedBooks.length !== 1"
+          @click="openEditDialog"
         >
           Edit</v-btn
         >
@@ -141,13 +142,13 @@
                     outlined
                     clearable
                     v-model="genre"
-                    :rules="[(v) => !!v || 'Atleast 1 genre is required']"
+                    :rules="[(v) => !!v || 'At least 1 genre is required']"
                   ></v-text-field>
                 </v-form>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn text @click="validateForm(isActive)">Save</v-btn>
+                <v-btn text @click="validateCreateForm(isActive)">Save</v-btn>
                 <v-btn text @click="isActive.value = false">Cancel</v-btn>
               </v-card-actions>
             </v-card>
@@ -209,6 +210,29 @@
       </tbody>
     </table>
   </div>
+
+  <!-- dialog to Edit the Author -->
+  <v-dialog v-model="editDialog" max-width="500">
+    <v-card>
+      <v-card-title>Edit Author</v-card-title>
+      <v-card-text>
+        <v-form ref="editForm" v-model="editFormValid">
+          <v-text-field
+            label="Author"
+            outlined
+            clearable
+            v-model="selectedAuthor"
+            :rules="[(v) => !!v || 'Author is required']"
+          ></v-text-field>
+        </v-form>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn text @click="validateEditForm">Save</v-btn>
+        <v-btn text @click="editDialog = false">Cancel</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -235,6 +259,9 @@ export default {
       author: "",
       genre: "",
       formValid: false,
+      editDialog: false,
+      selectedAuthor: "",
+      editFormValid: false,
     };
   },
   async mounted() {
@@ -243,7 +270,7 @@ export default {
 
   methods: {
     // form validation method
-    validateForm(isActive) {
+    validateCreateForm(isActive) {
       this.$refs.bookForm.validate();
       if (this.formValid) {
         isActive.value = false;
@@ -349,7 +376,7 @@ export default {
     async deleteBooks() {
       this.isFetching = true;
 
-      // useing promise.all to delete multiple books
+      // using promise.all to delete multiple books
       await Promise.all(
         this.selectedBooks.map(async (bookId) => {
           await fetch(`${import.meta.env.VUE_API_URL}/deleteBook/${bookId}`, {
@@ -369,6 +396,49 @@ export default {
     // set search attribute
     setSearchAttribute(searchAttribute) {
       this.searchAttribute = searchAttribute;
+    },
+
+    // open the edit dialog and load selected book data
+    openEditDialog() {
+      if (this.selectedBooks.length === 1) {
+        const selectedBook = this.books.find(
+          (book) => book.id === this.selectedBooks[0]
+        );
+        this.selectedAuthor = selectedBook.author;
+        this.editDialog = true;
+      }
+    },
+
+    // validate and update the selected book's author
+    validateEditForm() {
+      this.$refs.editForm.validate();
+      if (this.editFormValid) {
+        this.updateBookAuthor();
+      }
+    },
+
+    // method to update the book's author
+    async updateBookAuthor() {
+      const selectedBookId = this.selectedBooks[0];
+
+      try {
+        await fetch(
+          `${import.meta.env.VUE_API_URL}/updateBook/${selectedBookId}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ updatedAuthorName: this.selectedAuthor }),
+          }
+        );
+        this.editDialog = false;
+        this.selectedAuthor = "";
+        this.selectedBooks = [];
+        this.fetchBooks();
+      } catch (error) {
+        console.error(error);
+      }
     },
   },
 };
