@@ -119,4 +119,26 @@ class BookController extends Controller
             return response()->json(['message' => $e->getMessage()], 400);
         }
     }
+
+    /**
+     * Search for a book.
+     */
+    public function search(Request $request)
+    {
+        try {
+
+            $request->validate([
+                'searchTerm' => 'required|string',
+                'searchAttribute' => 'required|string'
+            ]);
+
+            $searchTerm = $request->searchTerm;
+            $searchAttribute = $request->searchAttribute;
+
+            $books = $this->bookRepository->searchBooks($searchAttribute, $searchTerm,);
+            return response()->json(['message' => 'Books found', 'books' => $books], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
 }

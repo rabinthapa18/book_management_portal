@@ -48,4 +48,12 @@ class BookRepository
     {
         return $this->model->orderByRaw("LOWER($sortAttribute) $order")->get();
     }
+
+    // Search books
+    public function searchBooks(string $searchAttribute, string $searchTerm): object
+    {
+        return $this->model
+            ->whereRaw("LOWER($searchAttribute) LIKE ?", ['%' . strtolower($searchTerm) . '%'])
+            ->get();
+    }
 }

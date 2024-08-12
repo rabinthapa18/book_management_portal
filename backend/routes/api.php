@@ -7,8 +7,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/books', [BookController::class, 'index']);
 // api to get specific book
 Route::get('/books/{id}', [BookController::class, 'show']);
+
+
 // api to sort books
 Route::post('/sortBooks', [BookController::class, 'sort']);
+// api to search books
+Route::post('/searchBooks', [BookController::class, 'search']);
 
 // api to add book
 Route::post('/addBook', [BookController::class, 'store']);
