@@ -218,6 +218,7 @@ dist
 # gitignore template for Vue.js projects
 #
 # Recommended template: Node.gitignore
+config.*.js
 
 # TODO: where does this rule come from?
 docs/_book
@@ -251,3 +252,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+
+#phpstorm
+.idea/
