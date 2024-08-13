@@ -235,18 +235,23 @@ class BookController extends Controller
     {
         $filename = "{$dataType}_books.xml";
 
-        $xml = new \SimpleXMLElement('<?xml version="1.0" encoding = "utf-8"?><books></books>');
-
-        foreach ($data as $row) {
-            $book = $xml->addChild('book');
-            if ($dataType === 'all') {
+        if ($dataType === 'all') {
+            $xml = new \SimpleXMLElement('<?xml version="1.0" encoding = "utf-8"?><books></books>');
+            foreach ($data as $row) {
+                $book = $xml->addChild('book');
                 $book->addChild('title', $row['title']);
                 $book->addChild('author', $row['author']);
                 $book->addChild('genre', $row['genre']);
-            } elseif ($dataType === 'title') {
-                $book->addChild('title', $row['title']);
-            } elseif ($dataType === 'author') {
-                $book->addChild('author', $row['author']);
+            }
+        } elseif ($dataType === 'title') {
+            $xml = new \SimpleXMLElement('<?xml version="1.0" encoding = "utf-8"?><titles></titles>');
+            foreach ($data as $row) {
+                $xml->addChild('title', $row['title']);
+            }
+        } elseif ($dataType === 'author') {
+            $xml = new \SimpleXMLElement('<?xml version="1.0" encoding = "utf-8"?><authors></authors>');
+            foreach ($data as $row) {
+                $xml->addChild('author', $row['author']);
             }
         }
 
@@ -257,4 +262,8 @@ class BookController extends Controller
             'Content-Disposition' => "attachment; filename=$filename",
         ]);
     }
+
+    /**
+     * Generate XML rows
+     */
 }
