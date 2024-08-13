@@ -13,6 +13,8 @@ Route::get('/books/{id}', [BookController::class, 'show']);
 Route::post('/sortBooks', [BookController::class, 'sort']);
 // api to search books
 Route::post('/searchBooks', [BookController::class, 'search']);
+// api to export books
+Route::post('/export', [BookController::class, 'export']);
 
 // api to add book
 Route::post('/addBook', [BookController::class, 'store']);

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Repository\BookRepository;
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
+
 
 class BookController extends Controller
 {
@@ -149,5 +151,110 @@ class BookController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
+    }
+
+    /**
+     * Export books data.
+     */
+    public function export(Request $request)
+    {
+        $request->validate([
+            'type' => 'required|string|in:csv,xml',
+            'dataType' => 'required|string|in:all,title,author',
+        ]);
+
+        try {
+            $type = $request->type;
+            $dataType = $request->dataType;
+
+            $books = $this->bookRepository->getAllBooks();
+            $data = [];
+
+            foreach ($books as $book) {
+                switch ($dataType) {
+                    case 'all':
+                        $data[] = ['title' => $book->title, 'author' => $book->author, 'genre' => $book->genre];
+                        break;
+                    case 'title':
+                        $data[] = ['title' => $book->title];
+                        break;
+                    case 'author':
+                        $data[] = ['author' => $book->author];
+                        break;
+                }
+            }
+
+            // return the file based on the type
+            if ($type === 'csv') {
+                return $this->generateCsv($data, $dataType);
+            } elseif ($type === 'xml') {
+                return $this->generateXml($data, $dataType);
+            }
+
+            return response()->json(['message' => 'Invalid file type'], 400);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * Generate CSV file
+     */
+    private function generateCsv(array $data, string $dataType)
+    {
+        $filename = "{$dataType}_books.csv";
+
+        $handle = fopen('php://temp', 'r+');
+
+        if ($dataType === 'all') {
+            fputcsv($handle, ['Title', 'Author', "Genre"]);
+        } elseif ($dataType === 'title') {
+            fputcsv($handle, ['Title']);
+        } elseif ($dataType === 'author') {
+            fputcsv($handle, ['Author']);
+        }
+
+        foreach ($data as $row) {
+            fputcsv($handle, $row);
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        return Response::make($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=$filename",
+        ]);
+    }
+
+    /**
+     * Generate XML file
+     */
+    private function generateXml(array $data, string $dataType)
+    {
+        $filename = "{$dataType}_books.xml";
+
+        $xml = new \SimpleXMLElement('<?xml version="1.0" encoding = "utf-8"?><books></books>');
+
+        foreach ($data as $row) {
+            $book = $xml->addChild('book');
+            if ($dataType === 'all') {
+                $book->addChild('title', $row['title']);
+                $book->addChild('author', $row['author']);
+                $book->addChild('genre', $row['genre']);
+            } elseif ($dataType === 'title') {
+                $book->addChild('title', $row['title']);
+            } elseif ($dataType === 'author') {
+                $book->addChild('author', $row['author']);
+            }
+        }
+
+        $xmlContent = $xml->asXML();
+
+        return Response::make($xmlContent, 200, [
+            'Content-Type' => 'application/xml',
+            'Content-Disposition' => "attachment; filename=$filename",
+        ]);
     }
 }
