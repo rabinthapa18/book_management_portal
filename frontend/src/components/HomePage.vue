@@ -44,13 +44,38 @@
       <v-col cols="12" md="1"> </v-col>
       <!-- export button -->
       <v-col cols="12" md="2">
-        <v-btn
-          rounded="0"
-          block
-          prepend-icon="mdi-file-export"
-          style="height: 100%"
-          >Export</v-btn
-        >
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn
+              v-bind="props"
+              rounded="0"
+              block
+              prepend-icon="mdi-file-export"
+              style="height: 100%"
+              >Export</v-btn
+            >
+          </template>
+          <v-list>
+            <v-list-item @click="exportBooks('all', 'csv')">
+              <v-list-item-title>All Data (CSV)</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="exportBooks('author', 'csv')">
+              <v-list-item-title>Author (CSV)</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="exportBooks('title', 'csv')">
+              <v-list-item-title>Title (CSV)</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="exportBooks('all', 'xml')">
+              <v-list-item-title>All Data (XML)</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="exportBooks('author', 'xml')">
+              <v-list-item-title>Author (XML)</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="exportBooks('title', 'xml')">
+              <v-list-item-title>Title (XML)</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </v-col>
     </v-row>
 
@@ -473,6 +498,34 @@ export default {
           });
 
           this.books = books;
+        })
+        .catch((error) => console.error(error))
+        .finally(() => (this.isFetching = false));
+    },
+
+    async exportBooks(dataType, type) {
+      this.isFetching = true;
+
+      // fetch books from API
+      await fetch(`${import.meta.env.VUE_API_URL}/export`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          dataType,
+          type,
+        }),
+      })
+        .then((response) => response.blob())
+        .then((blob) => {
+          const url = window.URL.createObjectURL(new Blob([blob]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", `${dataType}_books.${type}`);
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
         })
         .catch((error) => console.error(error))
         .finally(() => (this.isFetching = false));
