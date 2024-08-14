@@ -4,7 +4,7 @@ FROM php:8.2-cli
 # Set up the working directory
 WORKDIR /var/www
 
-# Instal dependencies
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
     unzip
@@ -18,20 +18,17 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy existing application directory contents
 COPY . /var/www
 
-# Copy existing application directory permissions
-COPY --chown=www-data:www-data . /var/www
-
-# Install PHP dependencies
-RUN composer install 
-
 # Expose the port for the Laravel application
 EXPOSE 8000
 
 # If no .env file exists, copy the .env.example file
 RUN test -f .env || cp .env.example .env
 
-# run migration and seed
+# Install PHP dependencies
+RUN composer install 
+
+# Migrate and seed the database
 RUN php artisan migrate --seed
 
-# Command to run the Laravel server
+# Run migration and seed
 CMD php artisan serve --host=0.0.0.0 --port=8000

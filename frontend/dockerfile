@@ -13,12 +13,8 @@ RUN npm install
 # Copying the rest of files
 COPY . .
 
-# If no config.dev.js file exists, copy the config.dev.example.js file
-RUN test -f config.dev.js || cp config-example.js config.dev.js
-
 # Exposing port
 EXPOSE 5173
 
 # Command to start the Vite server
-CMD ["npm", "run", "dev", "--", "--host"]
-
+CMD sh -c 'test -f config.js && npm run dev -- --host || cp config-example.js config.js && npm run dev -- --host'
