@@ -1,0 +1,24 @@
+# Using node js image
+FROM node:18-alpine
+
+# Setting up the working directory
+WORKDIR /app
+
+# Copying package.json and package-lock.json
+COPY package*.json ./
+
+# Installing dependencies
+RUN npm install
+
+# Copying the rest of files
+COPY . .
+
+# If no config.dev.js file exists, copy the config.dev.example.js file
+RUN test -f config.dev.js || cp config-example.js config.dev.js
+
+# Exposing port
+EXPOSE 5173
+
+# Command to start the Vite server
+CMD ["npm", "run", "dev", "--", "--host"]
+

@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/var/www
+    environment:
+      - APP_NAME=Laravel
+      - APP_ENV=local
+      - APP_KEY=
+      - APP_DEBUG=true
+      - APP_TIMEZONE=UTC
+      - APP_URL=http://localhost
+      - APP_LOCALE=en
+      - APP_FALLBACK_LOCALE=en
+      - APP_FAKER_LOCALE=en_US
+      - APP_MAINTENANCE_DRIVER=file
+      - BCRYPT_ROUNDS=12
+      - LOG_CHANNEL=stack
+      - LOG_STACK=single
+      - LOG_LEVEL=debug
+      - DB_CONNECTION=sqlite
+      - SESSION_DRIVER=database
+      - SESSION_LIFETIME=120
+      - BROADCAST_CONNECTION=log
+      - FILESYSTEM_DISK=local
+      - QUEUE_CONNECTION=database
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=dev
