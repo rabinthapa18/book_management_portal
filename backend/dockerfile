@@ -25,10 +25,8 @@ EXPOSE 8000
 RUN test -f .env || cp .env.example .env
 
 # Install PHP dependencies
-RUN composer install 
+COPY composer.json composer.lock ./
+RUN composer install
 
-# Migrate and seed the database
-RUN php artisan migrate --seed
-
-# Run migration and seed
-CMD php artisan serve --host=0.0.0.0 --port=8000
+# Run migration and start server
+CMD php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000
