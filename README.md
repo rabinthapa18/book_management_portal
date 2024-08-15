@@ -104,3 +104,92 @@ The project includes tests for the backend. To run the tests, start the backend 
 cd backend
 php artisan test
 ```
+
+## API Reference
+
+### Get all books
+
+```http
+  GET /api/books
+```
+
+### Add a book
+
+```http
+  POST /api/addBook
+```
+
+Request Body
+
+```json
+{
+  "title": "string",
+  "author": "string",
+  "genre": "string"
+}
+```
+
+### Update a book
+
+```http
+  PATCH /api/updateBook/{id}
+```
+
+Request Body
+
+```json
+{
+  "updatedAuthorName": "string"
+}
+```
+
+### Delete a book
+
+```http
+  DELETE /api/deleteBook/{id}
+```
+
+### Sort books
+
+```http
+  POST /api/sortBooks
+```
+
+Request Body
+
+```json
+{
+  "order": "asc|desc",
+  "sortAttribute": "title|author"
+}
+```
+
+### Search books
+
+```http
+  POST /api/searchBooks
+```
+
+Request Body
+
+```json
+{
+  "searchTerm": "string",
+  "searchAttribute": "title|author"
+}
+```
+
+### Export books
+
+```http
+  POST /api/export
+```
+
+Request Body
+
+```json
+{
+  "type": "csv|xml",
+  "dataType": "all|title|author"
+}
+```
