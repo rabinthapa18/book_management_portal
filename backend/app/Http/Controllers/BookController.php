@@ -41,6 +41,13 @@ class BookController extends Controller
             'genre' => 'required|string',
         ]);
         try {
+
+            // checking if genre is an array
+            $genre = json_decode($request->genre);
+            if (!is_array($genre)) {
+                return response()->json(['message' => 'Invalid genre format'], 400);
+            }
+
             $book = new Book();
             $book->fill($request->all());
             $this->bookRepository->addBook($book);
